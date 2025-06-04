@@ -2,7 +2,7 @@
 variable "region" {
   description = "Infrastructure region."
   type        = string
-  default     = "us-east-2"
+  default     = "us-east-1"
 }
 #Define IAM User Access Key
 variable "access_key" {
@@ -21,7 +21,7 @@ variable "secret_key" {
 variable "name" {
   description = "The name of the application."
   type        = string
-  default     = "app-6"
+  default     = "ecs-bg-test"
 }
 variable "image_tag" {
   description = "The name of the Docker image that gets created in the first job and is shared with the deploy job."

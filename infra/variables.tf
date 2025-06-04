@@ -2,7 +2,7 @@
 variable "region" {
   description = "Infrastructure region."
   type        = string
-  default     = "us-east-2"
+  default     = "us-east-1"
 }
 #Define IAM User Access Key
 variable "access_key" {
@@ -21,7 +21,7 @@ variable "secret_key" {
 variable "name" {
   description = "The name of the application."
   type        = string
-  default     = "app-6"
+  default     = "ecs-bg-test"
 }
 variable "vpc_cidr" {
   description = "The CIDR of the VPC."
@@ -41,7 +41,7 @@ variable "subnet_cidr_private" {
 variable "availability_zone" {
   description = "The availability zones for teh public subnets."
   type        = list(any)
-  default     = ["us-east-2a", "us-east-2b", "us-east-2c"]
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
 variable "ecs_secret" {

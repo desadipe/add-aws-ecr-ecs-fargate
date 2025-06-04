@@ -1,6 +1,6 @@
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key
 resource "aws_kms_key" "custom_kms_key" {
-  description             = "KMS key for app-6"
+  description             = "KMS key for ecs-bg-test"
   deletion_window_in_days = 7
   enable_key_rotation     = true
 }

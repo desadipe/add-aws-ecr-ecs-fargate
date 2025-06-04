@@ -14,8 +14,8 @@ on:
       - 'deploy/**'
       - '.github/workflows/app-ci-cd.yml'
 env:
-  AWS_REGION: us-east-2                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: app-6
+  AWS_REGION: us-east-1                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: ecs-bg-deploy-ecr
 permissions: read-all
 jobs:
   build:
