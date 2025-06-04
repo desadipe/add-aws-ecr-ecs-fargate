@@ -13,7 +13,7 @@ provider "aws" {
   secret_key = var.secret_key
   default_tags {
     tags = {
-      Source = "https://github.com/kunduso/add-aws-ecr-ecs-fargate"
+      Source = "https://github.com/desadipe/add-aws-ecr-ecs-fargate"
     }
   }
 }
