@@ -22,10 +22,10 @@ locals {
     ]
     Hooks = [
       {
-        BeforeInstall = local.test_lambda_arn
+        AfterInstall = local.test_lambda_arn
       },
       {
-        AfterInstall = local.validation_lambda_arn
+        BeforeAllowTraffic = local.validation_lambda_arn
       }
     ]
   }
