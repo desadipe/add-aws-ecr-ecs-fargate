@@ -24,8 +24,8 @@ locals {
         BeforeInstall = {
           # Lambda function to run validation checks
           ValidationFunction = {
-            Location = local.validation_lambda_arn
-            TimeoutInSeconds = 300  # 5 minutes timeout
+            Location         = local.validation_lambda_arn
+            TimeoutInSeconds = 300 # 5 minutes timeout
           }
         }
         BeforeAllowTraffic = "LambdaFunctionToValidateBeforeAllowingTraffic"
@@ -37,14 +37,14 @@ locals {
         # First run the validation Lambda
         ValidateDeployment = {
           Lambda = {
-            Function = local.validation_lambda_arn
+            Function         = local.validation_lambda_arn
             TimeoutInSeconds = 300
           }
         }
         # Then wait for manual approval
         WaitForApproval = {
-          Action = "WAIT_FOR_MANUAL_APPROVAL"
-          TimeoutInMinutes = 60  # Adjust timeout as needed
+          Action           = "WAIT_FOR_MANUAL_APPROVAL"
+          TimeoutInMinutes = 60 # Adjust timeout as needed
         }
         # Finally allow traffic
         AllowTraffic = {
