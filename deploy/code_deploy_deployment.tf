@@ -1,7 +1,9 @@
 locals {
   # Lambda function ARN - replace this with your actual Lambda ARN reference
-  test_lambda_arn       = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_test"
-  validation_lambda_arn = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_validation"
+  test_lambda_arn         = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_test"
+  validation_lambda_arn   = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_validation"
+  test_lambda_name        = "ecs_deployment_test"
+  validation_lambda_name  = "ecs_deployment_validation"
 
   # appspec file
   appspec = {
@@ -22,10 +24,10 @@ locals {
     ]
     Hooks = [
       {
-        AfterInstall = local.test_lambda_arn
+        AfterInstall = local.test_lambda_name
       },
       {
-        BeforeAllowTraffic = local.validation_lambda_arn
+        BeforeAllowTraffic = local.validation_lambda_name
       }
     ]
   }
