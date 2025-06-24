@@ -1,6 +1,6 @@
 locals {
   # Lambda function ARN - replace this with your actual Lambda ARN reference
-  test_lambda_arn = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_test"
+  test_lambda_arn       = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_test"
   validation_lambda_arn = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_validation"
 
   # appspec file
@@ -22,47 +22,12 @@ locals {
     ]
     Hooks = [
       {
-        # BeforeInstall = {
-        #   # Lambda function to run validation checks
-        #   ValidationFunction = {
-        #     Location         = local.validation_lambda_arn
-        #     TimeoutInSeconds = 300 # 5 minutes timeout
-        #   }
-        # }
-        # BeforeAllowTraffic = "LambdaFunctionToValidateBeforeAllowingTraffic"
         BeforeInstall = local.test_lambda_arn
       },
       {
         AfterInstall = local.validation_lambda_arn
       }
     ]
-    # Lifecycle hooks for manual approval
-    # Lifecycle = {
-    #   BeforeAllowTraffic = {
-    #     WaitForManualApproval = {
-    #       Action: "WAIT_FOR_MANUAL_APPROVAL"
-    #       TimeoutInMinutes: 60
-    #     }
-    #   }
-    #   BeforeInstall = {
-    #     # First run the validation Lambda
-    #     ValidateDeployment = {
-    #       Lambda = {
-    #         Function         = local.validation_lambda_arn
-    #         TimeoutInSeconds = 300
-    #       }
-    #     }
-    #     # Then wait for manual approval
-    #     WaitForApproval = {
-    #       Action           = "WAIT_FOR_MANUAL_APPROVAL"
-    #       TimeoutInMinutes = 60 # Adjust timeout as needed
-    #     }
-    #     # Finally allow traffic
-    #     AllowTraffic = {
-    #       Action = "ALLOW_TRAFFIC"
-    #     }
-    #   }
-    # }
   }
 
   appspec_content = replace(jsonencode(local.appspec), "\"", "\\\"")
