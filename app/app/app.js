@@ -13,7 +13,7 @@ app.use(morgan('combined'));
 app.use('/healthcheck', require('./route/healthcheck'));
 
 const port = process.env.PORT || 8080;
-const message = process.env.MESSAGE || "Hello from the Docker container! Hosted on ECS - Test on 20250623";
+const message = process.env.MESSAGE || "Hello from the Docker container! Hosted on ECS - Test on 20250624-1";
 const secretName = 'ecs_secret'; // Name of your AWS Secrets Manager secret
 
 // Retrieve secret value asynchronously
