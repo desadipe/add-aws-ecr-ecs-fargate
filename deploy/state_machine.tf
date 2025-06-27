@@ -13,7 +13,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
         Next     = "ManualApproval"
       }
       ManualApproval = {
-        Type = "Task"
+        Type     = "Task"
         Resource = "arn:aws:states:::sns:publish"
         Parameters = {
           TopicArn = aws_sns_topic.approval_topic.arn
