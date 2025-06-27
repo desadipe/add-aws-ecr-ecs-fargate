@@ -10,6 +10,6 @@ resource "aws_lambda_function" "test_lambda" {
 }
 
 # Output values
-output "state_machine_arn" {
+output "test_lambda_arn" {
   value = aws_lambda_function.test_lambda.arn
 }
