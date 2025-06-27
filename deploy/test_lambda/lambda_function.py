@@ -44,29 +44,14 @@ def lambda_handler(event, context):
         ##################################################
         # VALIDATION TESTS
         ##################################################
-        # if (random.randint(0, 1) == 0):
-        #     status = 'Succeeded'
-        # else:
-        #     status = 'Failed'
+        if (random.randint(0, 1) == 0):
+            status = 'Succeeded'
+        else:
+            status = 'Failed'
         
-        # # Validate the status value
-        # if status not in ['Succeeded', 'Failed']:
-        #     raise ValueError("Invalid status value. Must be 'Succeeded' or 'Failed'")
-
-        # statusVal = random.randint(0, 5)
-        # match statusVal:
-        #     case 0:
-        #         return "Succeeded"
-        #     case 1:
-        #         return "Pending"
-        #     case 2:
-        #         return "InProgress"
-        #     case 5:
-        #         return "Failed"
-        #     case _:
-        #         return "Unknown"
-
-        status = "Succeeded"
+        # Validate the status value
+        if status not in ['Succeeded', 'Failed']:
+            raise ValueError("Invalid status value. Must be 'Succeeded' or 'Failed'")
 
         # Write to SSM Parameter Store
         response = ssm.put_parameter(
