@@ -1,7 +1,7 @@
 # Create zip file from lambda code
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda"  # Directory containing your lambda code
+  source_dir  = "${path.module}/lambda" # Directory containing your lambda code
   output_path = "${path.module}/lambda_function.zip"
 }
 
