@@ -29,7 +29,7 @@ data "archive_file" "trigger_lambda_zip" {
 }
 
 # Lambda Function
-resource "aws_lambda_function" "test_lambda" {
+resource "aws_lambda_function" "trigger_lambda" {
   filename      = "trigger_lambda.zip"
   function_name = "ecs-bg-lambda-trigger-tf"
   role          = "arn:aws:iam::791573251752:role/dd-lambdaSSMFullAccess-Role"
