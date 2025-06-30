@@ -24,6 +24,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       }
     }
   })
+  #checkov:skip=CKV_AWS_284: Ensure State Machine has X-Ray tracing enabled.
+  #Reason: Tracing is not required for this StepFunction.
 }
 
 # IAM Role for Step Functions

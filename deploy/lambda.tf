@@ -8,11 +8,12 @@ data "archive_file" "test_lambda_zip" {
 
 # Lambda Function
 resource "aws_lambda_function" "test_lambda" {
-  filename      = "test_lambda.zip"
-  function_name = "ecs-bg-lambda-test-tf"
-  role          = "arn:aws:iam::791573251752:role/dd-lambdaSSMFullAccess-Role"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
+  filename         = "${path.module}/test_lambda.zip"
+  source_code_hash = data.archive_file.test_lambda_zip.output_base64sha256
+  function_name    = "ecs-bg-lambda-test-tf"
+  role             = "arn:aws:iam::791573251752:role/dd-lambdaSSMFullAccess-Role"
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.12"
 }
 
 # Output values
@@ -30,11 +31,12 @@ data "archive_file" "trigger_lambda_zip" {
 
 # Lambda Function
 resource "aws_lambda_function" "trigger_lambda" {
-  filename      = "trigger_lambda.zip"
-  function_name = "ecs-bg-lambda-trigger-tf"
-  role          = "arn:aws:iam::791573251752:role/dd-lambdaSSMFullAccess-Role"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
+  filename         = "${path.module}/trigger_lambda.zip"
+  source_code_hash = data.archive_file.trigger_lambda_zip.output_base64sha256
+  function_name    = "ecs-bg-lambda-trigger-tf"
+  role             = "arn:aws:iam::791573251752:role/dd-lambdaSSMFullAccess-Role"
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.12"
 
   # Add environment variables
   environment {
