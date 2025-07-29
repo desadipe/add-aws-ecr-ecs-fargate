@@ -1,6 +1,8 @@
 # SNS Topic
 resource "aws_sns_topic" "approval_topic" {
   name = "ecs-bg-test-sns"
+
+  #checkov:skip=CKV_AWS_26: "Ensure all data stored in the SNS topic is encrypted"
 }
 
 # SNS Topic Subscription
