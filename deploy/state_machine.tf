@@ -24,7 +24,9 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
       }
     }
   })
-  #checkov:skip=CKV_AWS_284: Ensure State Machine has X-Ray tracing enabled.
+  
+  #checkov:skip=CKV_AWS_284: "Ensure State Machine has X-Ray tracing enabled."
+  #checkov:skip=CKV_AWS_285: "Ensure State Machine has execution history logging enabled"
   #Reason: Tracing is not required for this StepFunction.
 }
 

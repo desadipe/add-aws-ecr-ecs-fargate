@@ -51,13 +51,12 @@ resource "aws_lambda_function" "trigger_lambda" {
       STATE_MACHINE_ARN = aws_sfn_state_machine.sfn_state_machine.arn
     }
   }
-  
-  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
-  #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
+  #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
-  
 }
 
 # Output values
