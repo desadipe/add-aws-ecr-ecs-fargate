@@ -4,6 +4,8 @@ locals {
   validation_lambda_arn  = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_validation"
   test_lambda_name       = "ecs_deployment_test"
   validation_lambda_name = "ecs_deployment_validation"
+  cluster_name           = "ecs-bg-deployment-test"
+  service_name           = "ecs-bg-deployment-test-service"
 
   # appspec file
   appspec = {
@@ -52,6 +54,11 @@ aws deploy create-deployment \
     --revision '{"revisionType": "AppSpecContent", "appSpecContent": {"content": "${local.appspec_content}", "sha256":"${local.appspec_sha256}"}}' \
     --description "Deployment from Terraform" \
     --output json
+
+aws ecs update-service \
+    --cluster "${local.cluster_name}" \
+    --service "${local.service_name}" \
+    --task-definition "${aws_ecs_task_definition.web_app.arn}"
 EOT
 )
 
