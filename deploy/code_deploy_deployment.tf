@@ -34,6 +34,29 @@ locals {
     ]
   }
 
+  # deployment configurations
+  deployment_config = {
+    deploymentConfiguration = {
+      deploymentCircuitBreaker = {
+        enable   = true
+        rollback = true
+      }
+      maximumPercent        = 200
+      minimumHealthyPercent = 100
+    }
+    lifecycleHooks = [
+      {
+        name      = "POST_SCALE_UP"
+        targetArn = local.test_lambda_arn
+      },
+      {
+        name      = "PRODUCTION_TRAFFIC_SHIFT"
+        targetArn = local.validation_lambda_arn
+      }
+    ]
+  }
+
+
   appspec_content = replace(jsonencode(local.appspec), "\"", "\\\"")
   appspec_sha256  = sha256(jsonencode(local.appspec))
 
@@ -58,7 +81,10 @@ aws deploy create-deployment \
 aws ecs update-service \
     --cluster "${local.cluster_name}" \
     --service "${local.service_name}" \
-    --task-definition "${aws_ecs_task_definition.web_app.arn}"
+    --task-definition "${aws_ecs_task_definition.web_app.arn}" \
+    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100}' \
+    --service-connect-configuration '{"enabled":false}' \
+    --lifecycle-hooks '[{"name":"POST_SCALE_UP","targetArn":"${local.test_lambda_arn}"},{"name":"PRODUCTION_TRAFFIC_SHIFT","targetArn":"${local.validation_lambda_arn}"}]'
 EOT
 )
 
