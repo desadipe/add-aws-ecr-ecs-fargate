@@ -83,14 +83,6 @@ aws ecs update-service \
     --cluster "${local.cluster_name}" \
     --service "${local.service_name}" \
     --task-definition "${aws_ecs_task_definition.web_app.arn}" \
-    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100}' \
-    --service-connect-configuration '{"enabled":false}' \
-    --lifecycle-hooks '[{"name":"POST_SCALE_UP","targetArn":"${local.test_lambda_arn}"},{"name":"PRODUCTION_TRAFFIC_SHIFT","targetArn":"${local.validation_lambda_arn}"}]'
-
-aws ecs update-service \
-    --cluster "${local.cluster_name}" \
-    --service "${local.service_name}" \
-    --task-definition "${aws_ecs_task_definition.web_app.arn}" \
     --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"],
             "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.test_lambda_arn}"},{"lifecycleStages":["PRODUCTION_TRAFFIC_SHIFT"],"roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.validation_lambda_arn}"}]}' \
     --service-connect-configuration '{"enabled":false}'
