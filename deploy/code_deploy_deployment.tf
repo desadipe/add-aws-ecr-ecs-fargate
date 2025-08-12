@@ -2,6 +2,7 @@ locals {
   # Lambda function ARN - replace this with your actual Lambda ARN reference
   test_lambda_arn        = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_test"
   validation_lambda_arn  = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_validation"
+  lambda_iam_role_arn    = "arn:aws:iam::791573251752:role/dd-ecsLoadBalancer-Role"
   test_lambda_name       = "ecs_deployment_test"
   validation_lambda_name = "ecs_deployment_validation"
   cluster_name           = "ecs-bg-deployment-test"
@@ -85,8 +86,19 @@ aws ecs update-service \
     --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100}' \
     --service-connect-configuration '{"enabled":false}' \
     --lifecycle-hooks '[{"name":"POST_SCALE_UP","targetArn":"${local.test_lambda_arn}"},{"name":"PRODUCTION_TRAFFIC_SHIFT","targetArn":"${local.validation_lambda_arn}"}]'
+
+aws ecs update-service \
+    --cluster "${local.cluster_name}" \
+    --service "${local.service_name}" \
+    --task-definition "${aws_ecs_task_definition.web_app.arn}" \
+    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"],
+            "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.test_lambda_arn}"},{"lifecycleStages":["PRODUCTION_TRAFFIC_SHIFT"],"roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.validation_lambda_arn}"}]}' \
+    --service-connect-configuration '{"enabled":false}'
 EOT
 )
+
+echo "AWS CLI VERSION"
+echo "$(aws --version)"
 
 echo "Command to be executed:"
 echo "$COMMAND"
@@ -98,7 +110,7 @@ COMMAND_EXIT_CODE=$?
 echo "Command exit code: $COMMAND_EXIT_CODE"
 echo "Raw output:"
 echo "$DEPLOYMENT_INFO"
-
+q
 if [ $COMMAND_EXIT_CODE -ne 0 ]; then
     echo "Error: AWS CLI command failed"
     exit $COMMAND_EXIT_CODE
