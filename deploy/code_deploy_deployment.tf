@@ -2,6 +2,7 @@ locals {
   # Lambda function ARN - replace this with your actual Lambda ARN reference
   test_lambda_arn        = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_test"
   validation_lambda_arn  = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_validation"
+  POST_SCALE_UP          = "arn:aws:lambda:us-east-1:791573251752:function:ecs_POST_SCALE_UP"
   lambda_iam_role_arn    = "arn:aws:iam::791573251752:role/dd-ecsLoadBalancer-Role"
   test_lambda_name       = "ecs_deployment_test"
   validation_lambda_name = "ecs_deployment_validation"
@@ -57,7 +58,6 @@ locals {
     ]
   }
 
-
   appspec_content = replace(jsonencode(local.appspec), "\"", "\\\"")
   appspec_sha256  = sha256(jsonencode(local.appspec))
 
@@ -83,8 +83,7 @@ aws ecs update-service \
     --cluster "${local.cluster_name}" \
     --service "${local.service_name}" \
     --task-definition "${aws_ecs_task_definition.web_app.arn}" \
-    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"],
-            "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.test_lambda_arn}"},{"lifecycleStages":["PRODUCTION_TRAFFIC_SHIFT"],"roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.validation_lambda_arn}"}]}' \
+    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"], "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.POST_SCALE_UP}"}]}' \
     --service-connect-configuration '{"enabled":false}'
 EOT
 )
