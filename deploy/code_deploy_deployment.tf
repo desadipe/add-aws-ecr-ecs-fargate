@@ -102,7 +102,7 @@ COMMAND_EXIT_CODE=$?
 echo "Command exit code: $COMMAND_EXIT_CODE"
 echo "Raw output:"
 echo "$DEPLOYMENT_INFO"
-q
+
 if [ $COMMAND_EXIT_CODE -ne 0 ]; then
     echo "Error: AWS CLI command failed"
     exit $COMMAND_EXIT_CODE
