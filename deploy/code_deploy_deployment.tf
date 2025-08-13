@@ -36,27 +36,8 @@ locals {
     ]
   }
 
-  # deployment configurations
-  deployment_config = {
-    deploymentConfiguration = {
-      deploymentCircuitBreaker = {
-        enable   = true
-        rollback = true
-      }
-      maximumPercent        = 200
-      minimumHealthyPercent = 100
-    }
-    lifecycleHooks = [
-      {
-        name      = "POST_SCALE_UP"
-        targetArn = local.test_lambda_arn
-      }
-    ]
-  }
-
-  appspec_content           = replace(jsonencode(local.appspec), "\"", "\\\"")
-  appspec_sha256            = sha256(jsonencode(local.appspec))
-  deployment_config_content = replace(jsonencode(local.deployment_config), "\"", "\\\"")
+  appspec_content = replace(jsonencode(local.appspec), "\"", "\\\"")
+  appspec_sha256  = sha256(jsonencode(local.appspec))
 
   # create deployment script
   script = <<EOF
@@ -80,7 +61,7 @@ aws ecs update-service \
     --cluster "${local.cluster_name}" \
     --service "${local.service_name}" \
     --task-definition "${aws_ecs_task_definition.web_app.arn}" \
-    --deployment-configuration "${local.deployment_config}" \
+    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"], "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.POST_SCALE_UP}"}]}' \
     --service-connect-configuration '{"enabled":false}'
 
 EOT
