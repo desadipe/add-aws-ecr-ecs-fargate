@@ -80,7 +80,7 @@ aws ecs update-service \
     --cluster "${local.cluster_name}" \
     --service "${local.service_name}" \
     --task-definition "${aws_ecs_task_definition.web_app.arn}" \
-    --deployment-configuration "${local.deployment_config_content}" \
+    --deployment-configuration "${local.deployment_config}" \
     --service-connect-configuration '{"enabled":false}'
 
 EOT
