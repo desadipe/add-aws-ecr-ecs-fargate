@@ -91,6 +91,15 @@ EOT
 echo "AWS CLI VERSION"
 echo "$(aws --version)"
 
+echo "APPSPEC AS IS"
+echo "${local.appspec}"
+
+echo "APPSPEC_CONTENT_AFTER REPLACEMENT"
+echo "${local.appspec_content}"
+
+echo "DEPLOYMENT CONFIG AS IS"
+echo "${local.deployment_config}"
+
 echo "Command to be executed:"
 echo "$COMMAND"
 
