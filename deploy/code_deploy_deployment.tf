@@ -50,16 +50,13 @@ locals {
       {
         name      = "POST_SCALE_UP"
         targetArn = local.test_lambda_arn
-      },
-      {
-        name      = "PRODUCTION_TRAFFIC_SHIFT"
-        targetArn = local.validation_lambda_arn
       }
     ]
   }
 
-  appspec_content = replace(jsonencode(local.appspec), "\"", "\\\"")
-  appspec_sha256  = sha256(jsonencode(local.appspec))
+  appspec_content           = replace(jsonencode(local.appspec), "\"", "\\\"")
+  appspec_sha256            = sha256(jsonencode(local.appspec))
+  deployment_config_content = replace(jsonencode(local.deployment_config), "\"", "\\\"")
 
   # create deployment script
   script = <<EOF
@@ -83,22 +80,14 @@ aws ecs update-service \
     --cluster "${local.cluster_name}" \
     --service "${local.service_name}" \
     --task-definition "${aws_ecs_task_definition.web_app.arn}" \
-    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"], "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.POST_SCALE_UP}"}]}' \
+    --deployment-configuration "${local.deployment_config_content}" \
     --service-connect-configuration '{"enabled":false}'
+
 EOT
 )
 
 echo "AWS CLI VERSION"
 echo "$(aws --version)"
-
-echo "APPSPEC AS IS"
-echo "${local.appspec}"
-
-echo "APPSPEC_CONTENT_AFTER REPLACEMENT"
-echo "${local.appspec_content}"
-
-echo "DEPLOYMENT CONFIG AS IS"
-echo "${local.deployment_config}"
 
 echo "Command to be executed:"
 echo "$COMMAND"
