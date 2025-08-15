@@ -22,3 +22,15 @@ resource "aws_ssm_parameter" "infra_output" {
     "kms_arn" : "${aws_kms_key.custom_kms_key.arn}"
   })
 }
+
+
+#https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter
+resource "aws_ssm_parameter" "state_machine_info" {
+  name        = "/${aws_sfn_state_machine.sfn_state_machine.name}/info"
+  description = "State Machine Execution Information"
+  type        = "String"
+  value = ""
+  lifecycle {
+    ignore_changes = [value]
+  }
+}

@@ -3,42 +3,37 @@
 import json
 import boto3
 import os
+import random
 from botocore.exceptions import ClientError
 
-# Initialize AWS clients
-sfn_client = boto3.client('stepfunctions')
+# Set up logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
-# Get state machine ARN from environment variable
-STATE_MACHINE_ARN = os.environ.get('STATE_MACHINE_ARN')
+# Initialize SSM client
+ssm = boto3.client('ssm')
+
+STATE_MACHINE_INFO = os.environ.get('STATE_MACHINE_INFO')
 
 def handler(event, context):
     try:
-        # Generate a unique execution name using timestamp
-        execution_name = f"execution-{context.aws_request_id}"
+        logger.info(f"Received event: {json.dumps(event)}")
 
-        # Prepare input for state machine
-        state_machine_input = {
-            "deploymentId": event.get('deploymentId', ''),
-            "hookId": event.get('hookId', ''),
-            "timestamp": event.get('timestamp', ''),
-            "originalEvent": event
-        }
+        # TEST 1
+        a = random.randint(1, 100)
+        b = random.randint(99, 199)
+        logger.info(f"Random numbers: {a} + {b}")
 
-        # Start state machine execution
-        response = sfn_client.start_execution(
-            stateMachineArn=STATE_MACHINE_ARN,
-            name=execution_name,
-            input=json.dumps(state_machine_input)
+        # Write to SSM Parameter Store
+        response = ssm.put_parameter(
+            Name=STATE_MACHINE_INFO,
+            Value=f'{a} + {b} = {a+b}',
+            Type='String',
+            Overwrite=True
         )
+        logger.info(f"SSM Write Response: {json.dumps(response)}")
 
-        return {
-            'statusCode': 200,
-            'body': json.dumps({
-                'message': 'State machine execution started successfully',
-                'executionArn': response['executionArn'],
-                'startDate': str(response['startDate'])
-            })
-        }
+        return response
 
     except ClientError as e:
         print(f"Error starting state machine: {str(e)}")

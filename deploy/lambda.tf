@@ -16,6 +16,13 @@ resource "aws_lambda_function" "test_lambda" {
   runtime                        = "python3.12"
   reserved_concurrent_executions = 10
 
+  # Add environment variables
+  environment {
+    variables = {
+      STATE_MACHINE_ARN = aws_sfn_state_machine.sfn_state_machine.arn
+    }
+  }
+
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
@@ -39,19 +46,17 @@ data "archive_file" "trigger_lambda_zip" {
 resource "aws_lambda_function" "trigger_lambda" {
   filename                       = "${path.module}/trigger_lambda.zip"
   source_code_hash               = data.archive_file.trigger_lambda_zip.output_base64sha256
-  function_name                  = "ecs-bg-lambda-trigger-tf"
+  function_name                  = "ecs_STPFN_TEST_tf"
   role                           = "arn:aws:iam::791573251752:role/dd-lambdaSSMFullAccess-Role"
   handler                        = "lambda_function.lambda_handler"
   runtime                        = "python3.12"
   reserved_concurrent_executions = 10
-
-  # Add environment variables
+  
   environment {
     variables = {
-      STATE_MACHINE_ARN = aws_sfn_state_machine.sfn_state_machine.arn
+      STATE_MACHINE_INFO = aws_ssm_parameter.state_machine_info.name
     }
   }
-
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"

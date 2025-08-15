@@ -1,6 +1,7 @@
 import boto3
 import json
 import logging
+import os
 import random
 from botocore.exceptions import ClientError
 
@@ -8,9 +9,10 @@ from botocore.exceptions import ClientError
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Initialize CodeDeploy client
+# Initialize clients
 codedeploy = boto3.client('codedeploy')
 ssm = boto3.client('ssm')
+sfn_client = boto3.client('stepfunctions')
 
 def lambda_handler(event, context):
     """
@@ -27,6 +29,14 @@ def lambda_handler(event, context):
         ##################################################
         # Log the received event
         logger.info(f"Received event: {json.dumps(event)}")
+
+        # Start state machine execution
+        response = sfn_client.start_execution(
+            stateMachineArn=os.environ.get('STATE_MACHINE_ARN'),
+            name=f"execution-{event['executionId']}",
+            input=json.dumps(event)
+        )
+        logger.info(f"State machine execution started: {response}")
 
         ##################################################
         # VALIDATION TESTS
