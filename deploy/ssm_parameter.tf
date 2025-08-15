@@ -4,7 +4,7 @@ resource "aws_ssm_parameter" "state_machine_info" {
   name        = "/ecs-bg-test-state-machine/info"
   description = "State Machine Execution Information"
   type        = "String"
-  value       = ""
+  value       = "initial_value"
   lifecycle {
     ignore_changes = [value]
   }
