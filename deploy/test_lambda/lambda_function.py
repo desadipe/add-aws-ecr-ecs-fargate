@@ -29,11 +29,12 @@ def lambda_handler(event, context):
         ##################################################
         # Log the received event
         logger.info(f"Received event: {json.dumps(event)}")
+        execution_id = f"execution-{event['executionId']}"
 
         # Start state machine execution
         try:
             response = sfn_client.describe_execution(
-                executionArn=f"execution-{event['executionId']}"
+                executionArn=f"arn:aws:states:us-east-1:791573251752:execution:ecs-bg-test-state-machine:{execution_id}"
             )
             
             # Extract relevant information
@@ -80,7 +81,7 @@ def lambda_handler(event, context):
             #     'body': json.dumps(execution_info)
             # }
 
-        except sfn.exceptions.ExecutionDoesNotExist:
+        except sfn_client.exceptions.ExecutionDoesNotExist:
             message = f"Execution ID not found: {execution_id} - Starting a new Execution"
             response = sfn_client.start_execution(
                 stateMachineArn=os.environ.get('STATE_MACHINE_ARN'),
