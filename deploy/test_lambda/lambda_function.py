@@ -31,12 +31,63 @@ def lambda_handler(event, context):
         logger.info(f"Received event: {json.dumps(event)}")
 
         # Start state machine execution
-        response = sfn_client.start_execution(
-            stateMachineArn=os.environ.get('STATE_MACHINE_ARN'),
-            name=f"execution-{event['executionId']}",
-            input=json.dumps(event)
-        )
-        logger.info(f"State machine execution started: {response}")
+        try:
+            response = sfn_client.describe_execution(
+                executionArn=f"execution-{event['executionId']}"
+            )
+            
+            # Extract relevant information
+            status = response['status']
+            start_date = response['startDate'].strftime('%Y-%m-%d %H:%M:%S')
+
+            logger.info(f"Execution ID FOUND: {execution_id} - Status: {status} - Start Date: {start_date}")
+
+            # # Get end date if execution is completed
+            # end_date = None
+            # if 'stopDate' in response:
+            #     end_date = response['stopDate'].strftime('%Y-%m-%d %H:%M:%S')
+
+            # # Store status in SSM
+            # ssm.put_parameter(
+            #     Name='/POST_SCALE_UP/state-machine-execution-status',
+            #     Value=status,
+            #     Type='String',
+            #     Overwrite=True
+            # )
+
+            # # Store datetime in SSM if execution is completed
+            # if end_date:
+            #     ssm.put_parameter(
+            #         Name='/POST_SCALE_UP/state-machine-execution-date-time',
+            #         Value=end_date,
+            #         Type='String',
+            #         Overwrite=True
+            #     )
+
+            # execution_info = {
+            #     'executionId': execution_id,
+            #     'status': status,
+            #     'startDate': start_date,
+            #     'endDate': end_date,
+            #     'input': json.loads(response['input']) if 'input' in response else None,
+            #     'output': json.loads(response['output']) if 'output' in response else None
+            # }
+
+            # logger.info(f"Execution info: {json.dumps(execution_info, indent=2)}")
+
+            # return {
+            #     'statusCode': 200,
+            #     'body': json.dumps(execution_info)
+            # }
+
+        except sfn.exceptions.ExecutionDoesNotExist:
+            message = f"Execution ID not found: {execution_id} - Starting a new Execution"
+            response = sfn_client.start_execution(
+                stateMachineArn=os.environ.get('STATE_MACHINE_ARN'),
+                name=f"execution-{event['executionId']}",
+                input=json.dumps(event)
+            )
+            logger.info(f"State machine execution started: {response}")
 
         ##################################################
         # VALIDATION TESTS

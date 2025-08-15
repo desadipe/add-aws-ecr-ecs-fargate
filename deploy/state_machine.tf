@@ -63,7 +63,7 @@ resource "aws_iam_role_policy" "step_function_policy" {
           "sns:Publish"
         ]
         Resource = [
-          "${aws_lambda_function.test_lambda.arn}",
+          "${aws_lambda_function.trigger_lambda.arn}",
           "${aws_sns_topic.approval_topic.arn}"
         ]
       }
