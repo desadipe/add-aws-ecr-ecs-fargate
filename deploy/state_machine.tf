@@ -9,7 +9,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     States = {
       ExecuteLambda = {
         Type     = "Task"
-        Resource = aws_lambda_function.test_lambda.arn
+        Resource = aws_lambda_function.trigger_lambda.arn
         Next     = "ManualApproval"
       }
       ManualApproval = {

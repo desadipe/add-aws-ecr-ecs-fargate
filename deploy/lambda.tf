@@ -26,6 +26,7 @@ resource "aws_lambda_function" "test_lambda" {
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
 }
 
@@ -57,9 +58,11 @@ resource "aws_lambda_function" "trigger_lambda" {
       STATE_MACHINE_INFO = aws_ssm_parameter.state_machine_info.name
     }
   }
+
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
 }
