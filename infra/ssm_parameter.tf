@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "state_machine_info" {
   name        = "/${aws_sfn_state_machine.sfn_state_machine.name}/info"
   description = "State Machine Execution Information"
   type        = "String"
-  value = ""
+  value       = ""
   lifecycle {
     ignore_changes = [value]
   }

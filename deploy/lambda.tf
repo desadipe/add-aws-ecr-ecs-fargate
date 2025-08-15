@@ -51,7 +51,7 @@ resource "aws_lambda_function" "trigger_lambda" {
   handler                        = "lambda_function.lambda_handler"
   runtime                        = "python3.12"
   reserved_concurrent_executions = 10
-  
+
   environment {
     variables = {
       STATE_MACHINE_INFO = aws_ssm_parameter.state_machine_info.name
