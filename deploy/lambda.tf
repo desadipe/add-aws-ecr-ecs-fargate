@@ -10,7 +10,7 @@ data "archive_file" "test_lambda_zip" {
 resource "aws_lambda_function" "test_lambda" {
   filename                       = "${path.module}/test_lambda.zip"
   source_code_hash               = data.archive_file.test_lambda_zip.output_base64sha256
-  function_name                  = "ecs-bg-lambda-test-tf"
+  function_name                  = "ecs_POST_SCALE_UP_tf"
   role                           = "arn:aws:iam::791573251752:role/dd-lambdaSSMFullAccess-Role"
   handler                        = "lambda_function.lambda_handler"
   runtime                        = "python3.12"
@@ -23,7 +23,7 @@ resource "aws_lambda_function" "test_lambda" {
 }
 
 # Output values
-output "test_lambda_arn" {
+output "ecs_POST_SCALE_UP_tf_arn" {
   value = aws_lambda_function.test_lambda.arn
 }
 

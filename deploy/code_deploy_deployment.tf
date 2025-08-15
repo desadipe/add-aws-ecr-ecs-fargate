@@ -61,7 +61,7 @@ aws ecs update-service \
     --cluster "${local.cluster_name}" \
     --service "${local.service_name}" \
     --task-definition "${aws_ecs_task_definition.web_app.arn}" \
-    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"], "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${local.POST_SCALE_UP}"}]}' \
+    --deployment-configuration '{"deploymentCircuitBreaker":{"enable":true,"rollback":true},"maximumPercent":200,"minimumHealthyPercent":100,"strategy":"BLUE_GREEN","lifecycleHooks":[{"lifecycleStages":["POST_SCALE_UP"], "roleArn": "${local.lambda_iam_role_arn}","hookTargetArn":"${aws_lambda_function.test_lambda.arn}"}]}' \
     --service-connect-configuration '{"enabled":false}'
 
 EOT

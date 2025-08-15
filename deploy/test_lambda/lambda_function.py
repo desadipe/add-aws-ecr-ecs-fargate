@@ -28,35 +28,27 @@ def lambda_handler(event, context):
         # Log the received event
         logger.info(f"Received event: {json.dumps(event)}")
 
-        # Read the DeploymentId from the event payload
-        deployment_id = event.get('DeploymentId')
-        if not deployment_id:
-            raise ValueError("DeploymentId not found in event payload")
-
-        # Read the LifecycleEventHookExecutionId from the event payload
-        lifecycle_event_hook_execution_id = event.get('LifecycleEventHookExecutionId')
-        if not lifecycle_event_hook_execution_id:
-            raise ValueError("LifecycleEventHookExecutionId not found in event payload")
-
-        logger.info(f"Processing deployment_id: {deployment_id}")
-        logger.info(f"Lifecycle event hook execution_id: {lifecycle_event_hook_execution_id}")
-
         ##################################################
         # VALIDATION TESTS
         ##################################################
-        if (random.randint(0, 1) == 0):
-            status = 'Succeeded'
-        else:
-            status = 'Failed'
+        # SUCCEEDED, FAILED, IN_PROGRESS
+        x = random.randint(0, 5)
+        logger.info(f"Random number: {x}")
         
-        # Validate the status value
-        if status not in ['Succeeded', 'Failed']:
-            raise ValueError("Invalid status value. Must be 'Succeeded' or 'Failed'")
+        if (x == 0):
+            hookStatus = 'SUCCEEDED'
+            return_response = {"hookStatus": "SUCCEEDED"}
+        elif (x == 6):
+            hookStatus = 'FAILED'
+            return_response = {"hookStatus": "FAILED"}
+        else:
+            hookStatus = 'IN_PROGRESS'
+            return_response = {"hookStatus": "IN_PROGRESS", "callBackDelay": 30}
 
         # Write to SSM Parameter Store
         response = ssm.put_parameter(
-            Name='automated_test_status',
-            Value=status,
+            Name='POST_SCALE_UP',
+            Value=hookStatus,
             Type='String',
             Overwrite=True
         )
@@ -64,29 +56,8 @@ def lambda_handler(event, context):
         ##################################################
         # GENERATE RESPONSE
         ##################################################
-        # Prepare the validation test results
-        params = {
-            'deploymentId': deployment_id,
-            'lifecycleEventHookExecutionId': lifecycle_event_hook_execution_id,
-            'status': status  # 'Succeeded' or 'Failed'
-        }
-
-        # Pass CodeDeploy the prepared validation test results
-        logger.info(f"Updating lifecycle event status with params: {params}")
-        response = codedeploy.put_lifecycle_event_hook_execution_status(**params)
-
-        message = 'Validation test succeeded' if status == 'Succeeded' else 'Validation test failed'
-        logger.info(message)
-
-        return {
-            'statusCode': 200,
-            'body': json.dumps({
-                'message': message,
-                'status': status,
-                'deploymentId': deployment_id,
-                'response': response
-            })
-        }
+        logger.info("Return Response: {}".format(json.dumps(return_response)))
+        return return_response
 
     except ValueError as ve:
         logger.error(f"Validation error: {str(ve)}")
