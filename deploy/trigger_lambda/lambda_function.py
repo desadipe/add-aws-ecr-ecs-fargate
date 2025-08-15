@@ -1,7 +1,6 @@
-# lambda/index.py
-
-import json
 import boto3
+import json
+import logging
 import os
 import random
 from botocore.exceptions import ClientError
@@ -15,7 +14,7 @@ ssm = boto3.client('ssm')
 
 STATE_MACHINE_INFO = os.environ.get('STATE_MACHINE_INFO')
 
-def handler(event, context):
+def lambda_handler(event, context):
     try:
         logger.info(f"Received event: {json.dumps(event)}")
 
