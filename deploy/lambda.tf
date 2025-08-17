@@ -53,12 +53,6 @@ resource "aws_lambda_function" "trigger_lambda" {
   runtime          = "python3.12"
   timeout          = 600
 
-  environment {
-    variables = {
-      STATE_MACHINE_INFO = aws_ssm_parameter.state_machine_info.name
-    }
-  }
-
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
   #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"

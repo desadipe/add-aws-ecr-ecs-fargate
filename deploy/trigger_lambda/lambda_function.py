@@ -13,32 +13,14 @@ logger.setLevel(logging.INFO)
 # Initialize SSM client
 ssm = boto3.client('ssm')
 
-STATE_MACHINE_INFO = os.environ.get('STATE_MACHINE_INFO')
-
 def lambda_handler(event, context):
     try:
-        logger.info(f"Received event: {json.dumps(event)}")
-
-        ##################################################
-        # VALIDATION TESTS 1
-        ##################################################
+        logger.info(f"Lambda: ecs_STPFN_TEST_tf Received event: {json.dumps(event)}")
         a = random.randint(1, 100)
-        b = random.randint(99, 199)
-        logger.info(f"Random numbers: {a} + {b}")
-
-        # Write to SSM Parameter Store
-        response = ssm.put_parameter(
-            Name=STATE_MACHINE_INFO,
-            Value=f'{a} + {b} = {a+b}',
-            Type='String',
-            Overwrite=True
-        )
-        logger.info(f"SSM STATE_MACHINE_INFO Write Response: {json.dumps(response)}")
         
         ##################################################
-        # VALIDATION TESTS 2
+        # VALIDATION TESTS  --- VALID RESPONSE >> SUCCEEDED, FAILED, IN_PROGRESS
         ##################################################
-        # SUCCEEDED, FAILED, IN_PROGRESS
         for i in range(5):
             x = random.randint(0, 5)
             time.sleep(a)
@@ -57,7 +39,7 @@ def lambda_handler(event, context):
             Overwrite=True
         )
 
-        logger.info(f"SSM POST_SCALE_UP Write Response: {json.dumps(response)}")
+        logger.info(f"SSM POST_SCALE_UP Parameter Write Response: {json.dumps(response)}")
         return response
 
     except ClientError as e:
