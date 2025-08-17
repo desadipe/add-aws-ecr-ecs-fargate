@@ -41,9 +41,8 @@ def lambda_handler(event, context):
             
             # Extract relevant information
             status = response['status']
-            start_date = response['startDate'].strftime('%Y-%m-%d %H:%M:%S')
 
-            logger.info(f"Execution ID FOUND: {execution_id} - Status: {status} - Start Date: {start_date}")
+            logger.info(f"Execution ID FOUND: {execution_id}")
 
             response = ssm.get_parameter(
                     Name='POST_SCALE_UP',
@@ -55,6 +54,9 @@ def lambda_handler(event, context):
                     return_response = {"hookStatus": "SUCCEEDED"}
                 elif response["Parameter"]["Value"] == "FAILED":
                     return_response = {"hookStatus": "FAILED"}
+                else:
+                    return_response = {"hookStatus": "IN_PROGRESS", "callBackDelay": 30}
+                    logger.info(f"Step Fn Status: {status} - SSM PARA Value: {response["Parameter"]["Value"]}")
     
 
         except sfn_client.exceptions.ExecutionDoesNotExist:

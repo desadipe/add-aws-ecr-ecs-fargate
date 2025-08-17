@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import random
+import time
 from botocore.exceptions import ClientError
 
 # Set up logging
@@ -38,15 +39,17 @@ def lambda_handler(event, context):
         # VALIDATION TESTS 2
         ##################################################
         # SUCCEEDED, FAILED, IN_PROGRESS
-        x = random.randint(0, 5)
-        logger.info(f"Random number: {x}")
-        
-        if (x == 0):
-            hookStatus = 'SUCCEEDED'
-        elif (x == 6):
-            hookStatus = 'FAILED'
-        else:
-            hookStatus = 'IN_PROGRESS'
+        for i in range(5):
+            logger.info(f"Loop iteration: {i}")
+            x = random.randint(0, 5)
+            logger.info(f"Random number: {x}")
+            
+            if (i == 4 or x == 0):
+                hookStatus = 'SUCCEEDED'
+                break
+            elif (x == 6):
+                hookStatus = 'FAILED'
+                time.sleep(a)
 
         response = ssm.put_parameter(
             Name='POST_SCALE_UP',
