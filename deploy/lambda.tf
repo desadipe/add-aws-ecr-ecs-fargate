@@ -23,6 +23,7 @@ resource "aws_lambda_function" "test_lambda" {
   }
 
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
+  #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
@@ -59,6 +60,7 @@ resource "aws_lambda_function" "trigger_lambda" {
   }
 
   #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda"
+  #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC"
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"

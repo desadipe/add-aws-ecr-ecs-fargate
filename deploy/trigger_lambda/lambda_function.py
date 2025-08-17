@@ -40,16 +40,15 @@ def lambda_handler(event, context):
         ##################################################
         # SUCCEEDED, FAILED, IN_PROGRESS
         for i in range(5):
-            logger.info(f"Loop iteration: {i}")
             x = random.randint(0, 5)
-            logger.info(f"Random number: {x}")
-            
+            time.sleep(a)
+            logger.info(f"Loop iteration: {i} --- Random number: {x} --- Sleep {a} seconds")
+
             if (i == 4 or x == 0):
                 hookStatus = 'SUCCEEDED'
                 break
             elif (x == 6):
                 hookStatus = 'FAILED'
-                time.sleep(a)
 
         response = ssm.put_parameter(
             Name='POST_SCALE_UP',
