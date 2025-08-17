@@ -10,9 +10,10 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # Initialize clients
-codedeploy = boto3.client('codedeploy')
-ssm = boto3.client('ssm')
-sfn_client = boto3.client('stepfunctions')
+codedeploy = boto3.client("codedeploy")
+ssm = boto3.client("ssm")
+sfn_client = boto3.client("stepfunctions")
+
 
 def lambda_handler(event, context):
     """
@@ -21,7 +22,7 @@ def lambda_handler(event, context):
         event: AWS Lambda event object
         context: AWS Lambda context object
     Returns:
-        dict: Response object containing status and message
+        dict: Response object containing stpfn_status and message
     """
     try:
         ##################################################
@@ -30,52 +31,53 @@ def lambda_handler(event, context):
         # Log the received event
         logger.info(f"Received event: {json.dumps(event)}")
         execution_id = f"execution-{event['executionId']}"
-
-        return_response = {"hookStatus": "IN_PROGRESS", "callBackDelay": 30}
+        return_response = {"hookstpfn_status": "IN_PROGRESS", "callBackDelay": 30}
 
         # Start state machine execution
         try:
-            response = sfn_client.describe_execution(
+            sfn_response = sfn_client.describe_execution(
                 executionArn=f"arn:aws:states:us-east-1:791573251752:execution:ecs-bg-test-state-machine:{execution_id}"
             )
-            
+
+            ssm_response = ssm.get_parameter(Name="POST_SCALE_UP", WithDecryption=False)
+
             # Extract relevant information
-            status = response['status']
+            stpfn_status = sfn_response["stpfn_status"]
+            ssm_status = ssm_response["Parameter"]["Value"]
 
-            logger.info(f"Execution ID FOUND: {execution_id}")
-
-            response = ssm.get_parameter(
-                    Name='POST_SCALE_UP',
-                    WithDecryption=False
-                )
-
-            if status == "SUCCEEDED":
-                if response["Parameter"]["Value"] == "SUCCEEDED":
-                    return_response = {"hookStatus": "SUCCEEDED"}
-                elif response["Parameter"]["Value"] == "FAILED":
-                    return_response = {"hookStatus": "FAILED"}
+            if stpfn_status == "SUCCEEDED":
+                if ssm_status == "SUCCEEDED":
+                    return_response = {"hookstpfn_status": "SUCCEEDED"}
+                elif ssm_status == "FAILED":
+                    return_response = {"hookstpfn_status": "FAILED"}
                 else:
-                    return_response = {"hookStatus": "IN_PROGRESS", "callBackDelay": 30}
-                    logger.info(f"Step Fn Status: {status} - SSM PARA Value: {response["Parameter"]["Value"]}")
-    
+                    return_response = {
+                        "hookstpfn_status": "IN_PROGRESS",
+                        "callBackDelay": 30,
+                    }
+            logger.info(
+                f"Execution ID FOUND: {execution_id} --- stpfn_status: {stpfn_status} --- ssm_status: {ssm_status} --- return_response: {return_response}"
+            )
 
         except sfn_client.exceptions.ExecutionDoesNotExist:
-            logger.info(f"Execution ID not found: {execution_id} - Starting a new Execution")
+            logger.info(
+                f"Execution ID {execution_id} NOT found --- Starting a new Execution"
+            )
 
-            response = sfn_client.start_execution(
-                stateMachineArn=os.environ.get('STATE_MACHINE_ARN'),
+            stpfn_response = sfn_client.start_execution(
+                stateMachineArn=os.environ.get("STATE_MACHINE_ARN"),
                 name=f"execution-{event['executionId']}",
-                input=json.dumps(event)
+                input=json.dumps(event),
             )
 
             # Write to SSM Parameter Store
-            response = ssm.put_parameter(
-                Name='POST_SCALE_UP',
-                Value="IN_PROGRESS",
-                Type='String',
-                Overwrite=True
+            ssm_response = ssm.put_parameter(
+                Name="POST_SCALE_UP", Value="IN_PROGRESS", Type="String", Overwrite=True
             )
-            logger.info(f"State machine execution started: {response}")
+
+            logger.info(
+                f"New Execution Started: {execution_id} --- stpfn_response: {stpfn_response} --- ssm_response: {ssm_response} --- return_response: {return_response}"
+            )
 
         ##################################################
         # GENERATE RESPONSE
@@ -86,29 +88,26 @@ def lambda_handler(event, context):
     except ValueError as ve:
         logger.error(f"Validation error: {str(ve)}")
         return {
-            'statusCode': 400,
-            'body': json.dumps({
-                'message': f"Validation error: {str(ve)}",
-                'status': 'Failed'
-            })
+            "statusCode": 400,
+            "body": json.dumps(
+                {"message": f"Validation error: {str(ve)}", "status": "Failed"}
+            ),
         }
 
     except ClientError as ce:
         logger.error(f"AWS API error: {str(ce)}")
         return {
-            'statusCode': 500,
-            'body': json.dumps({
-                'message': f"AWS API error: {str(ce)}",
-                'status': 'Failed'
-            })
+            "statusCode": 500,
+            "body": json.dumps(
+                {"message": f"AWS API error: {str(ce)}", "status": "Failed"}
+            ),
         }
 
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return {
-            'statusCode': 500,
-            'body': json.dumps({
-                'message': f"Unexpected error: {str(e)}",
-                'status': 'Failed'
-            })
+            "statusCode": 500,
+            "body": json.dumps(
+                {"message": f"Unexpected error: {str(e)}", "status": "Failed"}
+            ),
         }
