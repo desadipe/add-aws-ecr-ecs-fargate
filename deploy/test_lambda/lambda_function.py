@@ -42,7 +42,7 @@ def lambda_handler(event, context):
             ssm_response = ssm.get_parameter(Name="POST_SCALE_UP", WithDecryption=False)
 
             # Extract relevant information
-            stpfn_status = sfn_response["stpfn_status"]
+            stpfn_status = sfn_response["status"]
             ssm_status = ssm_response["Parameter"]["Value"]
 
             if stpfn_status == "SUCCEEDED":
