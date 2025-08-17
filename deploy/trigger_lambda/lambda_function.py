@@ -18,7 +18,9 @@ def lambda_handler(event, context):
     try:
         logger.info(f"Received event: {json.dumps(event)}")
 
-        # TEST 1
+        ##################################################
+        # VALIDATION TESTS 1
+        ##################################################
         a = random.randint(1, 100)
         b = random.randint(99, 199)
         logger.info(f"Random numbers: {a} + {b}")
@@ -30,8 +32,30 @@ def lambda_handler(event, context):
             Type='String',
             Overwrite=True
         )
-        logger.info(f"SSM Write Response: {json.dumps(response)}")
+        logger.info(f"SSM STATE_MACHINE_INFO Write Response: {json.dumps(response)}")
+        
+        ##################################################
+        # VALIDATION TESTS 2
+        ##################################################
+        # SUCCEEDED, FAILED, IN_PROGRESS
+        x = random.randint(0, 5)
+        logger.info(f"Random number: {x}")
+        
+        if (x == 0):
+            hookStatus = 'SUCCEEDED'
+        elif (x == 6):
+            hookStatus = 'FAILED'
+        else:
+            hookStatus = 'IN_PROGRESS'
 
+        response = ssm.put_parameter(
+            Name='POST_SCALE_UP',
+            Value=hookStatus,
+            Type='String',
+            Overwrite=True
+        )
+
+        logger.info(f"SSM POST_SCALE_UP Write Response: {json.dumps(response)}")
         return response
 
     except ClientError as e:

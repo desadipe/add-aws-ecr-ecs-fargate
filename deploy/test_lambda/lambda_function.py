@@ -31,6 +31,8 @@ def lambda_handler(event, context):
         logger.info(f"Received event: {json.dumps(event)}")
         execution_id = f"execution-{event['executionId']}"
 
+        return_response = {"hookStatus": "IN_PROGRESS", "callBackDelay": 30}
+
         # Start state machine execution
         try:
             response = sfn_client.describe_execution(
@@ -43,77 +45,35 @@ def lambda_handler(event, context):
 
             logger.info(f"Execution ID FOUND: {execution_id} - Status: {status} - Start Date: {start_date}")
 
-            # # Get end date if execution is completed
-            # end_date = None
-            # if 'stopDate' in response:
-            #     end_date = response['stopDate'].strftime('%Y-%m-%d %H:%M:%S')
+            response = ssm.get_parameter(
+                    Name='POST_SCALE_UP',
+                    WithDecryption=False
+                )
 
-            # # Store status in SSM
-            # ssm.put_parameter(
-            #     Name='/POST_SCALE_UP/state-machine-execution-status',
-            #     Value=status,
-            #     Type='String',
-            #     Overwrite=True
-            # )
-
-            # # Store datetime in SSM if execution is completed
-            # if end_date:
-            #     ssm.put_parameter(
-            #         Name='/POST_SCALE_UP/state-machine-execution-date-time',
-            #         Value=end_date,
-            #         Type='String',
-            #         Overwrite=True
-            #     )
-
-            # execution_info = {
-            #     'executionId': execution_id,
-            #     'status': status,
-            #     'startDate': start_date,
-            #     'endDate': end_date,
-            #     'input': json.loads(response['input']) if 'input' in response else None,
-            #     'output': json.loads(response['output']) if 'output' in response else None
-            # }
-
-            # logger.info(f"Execution info: {json.dumps(execution_info, indent=2)}")
-
-            # return {
-            #     'statusCode': 200,
-            #     'body': json.dumps(execution_info)
-            # }
+            if status == "SUCCEEDED":
+                if response["Parameter"]["Value"] == "SUCCEEDED":
+                    return_response = {"hookStatus": "SUCCEEDED"}
+                elif response["Parameter"]["Value"] == "FAILED":
+                    return_response = {"hookStatus": "FAILED"}
+    
 
         except sfn_client.exceptions.ExecutionDoesNotExist:
-            message = f"Execution ID not found: {execution_id} - Starting a new Execution"
+            logger.info(f"Execution ID not found: {execution_id} - Starting a new Execution")
+
             response = sfn_client.start_execution(
                 stateMachineArn=os.environ.get('STATE_MACHINE_ARN'),
                 name=f"execution-{event['executionId']}",
                 input=json.dumps(event)
             )
+
+            # Write to SSM Parameter Store
+            response = ssm.put_parameter(
+                Name='POST_SCALE_UP',
+                Value="IN_PROGRESS",
+                Type='String',
+                Overwrite=True
+            )
             logger.info(f"State machine execution started: {response}")
-
-        ##################################################
-        # VALIDATION TESTS
-        ##################################################
-        # SUCCEEDED, FAILED, IN_PROGRESS
-        x = random.randint(0, 5)
-        logger.info(f"Random number: {x}")
-        
-        if (x == 0):
-            hookStatus = 'SUCCEEDED'
-            return_response = {"hookStatus": "SUCCEEDED"}
-        elif (x == 6):
-            hookStatus = 'FAILED'
-            return_response = {"hookStatus": "FAILED"}
-        else:
-            hookStatus = 'IN_PROGRESS'
-            return_response = {"hookStatus": "IN_PROGRESS", "callBackDelay": 30}
-
-        # Write to SSM Parameter Store
-        response = ssm.put_parameter(
-            Name='POST_SCALE_UP',
-            Value=hookStatus,
-            Type='String',
-            Overwrite=True
-        )
 
         ##################################################
         # GENERATE RESPONSE
