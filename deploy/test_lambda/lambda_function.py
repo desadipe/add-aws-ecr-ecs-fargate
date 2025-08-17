@@ -31,7 +31,7 @@ def lambda_handler(event, context):
         # Log the received event
         logger.info(f"Received event: {json.dumps(event)}")
         execution_id = f"execution-{event['executionId']}"
-        return_response = {"hookstpfn_status": "IN_PROGRESS", "callBackDelay": 30}
+        return_response = {"hookStatus": "IN_PROGRESS", "callBackDelay": 30}
 
         # Start state machine execution
         try:
@@ -47,12 +47,12 @@ def lambda_handler(event, context):
 
             if stpfn_status == "SUCCEEDED":
                 if ssm_status == "SUCCEEDED":
-                    return_response = {"hookstpfn_status": "SUCCEEDED"}
+                    return_response = {"hookStatus": "SUCCEEDED"}
                 elif ssm_status == "FAILED":
-                    return_response = {"hookstpfn_status": "FAILED"}
+                    return_response = {"hookStatus": "FAILED"}
                 else:
                     return_response = {
-                        "hookstpfn_status": "IN_PROGRESS",
+                        "hookStatus": "IN_PROGRESS",
                         "callBackDelay": 30,
                     }
             logger.info(

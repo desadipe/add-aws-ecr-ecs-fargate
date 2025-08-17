@@ -1,8 +1,4 @@
 locals {
-  # Lambda function ARN - replace this with your actual Lambda ARN reference
-  test_lambda_arn        = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_test"
-  validation_lambda_arn  = "arn:aws:lambda:us-east-1:791573251752:function:ecs_deployment_validation"
-  POST_SCALE_UP          = "arn:aws:lambda:us-east-1:791573251752:function:ecs_POST_SCALE_UP"
   lambda_iam_role_arn    = "arn:aws:iam::791573251752:role/dd-ecsLoadBalancer-Role"
   test_lambda_name       = "ecs_deployment_test"
   validation_lambda_name = "ecs_deployment_validation"
