@@ -4,7 +4,7 @@ resource "aws_ecs_service" "service" {
   cluster              = local.infra_output["aws_ecs_cluster_id"]
   task_definition      = aws_ecs_task_definition.web_app.arn
   desired_count        = 2
-  force_new_deployment = true
+  force_new_deployment = false
   load_balancer {
     target_group_arn = local.infra_output["aws_lb_blue_target_group_arn"]
     container_name   = "first"
